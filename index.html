@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residential Solar Energy Calculator</title>
+    <link rel="icon" href="solar.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+        .solar-panel {
+            background: linear-gradient(45deg, #2c3e50, #4ca1af);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .shadow-3d {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .input-highlight {
+            transition: all 0.3s ease;
+        }
+        .input-highlight:focus {
+            border-color: #f6d365;
+            box-shadow: 0 0 0 3px rgba(246, 211, 101, 0.3);
+        }
+        .result-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        .animate-pulse-slow {
+            animation: pulse 4s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg font-sans">
+    <div class="container mx-auto px-4 py-12">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                    <i class="fas fa-solar-panel mr-3"></i> Solar Energy Setup Calculator
+                </h1>
+                <p class="text-xl text-white opacity-90">Calculate your solar panel requirements and potential savings for your home</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Input Form -->
+                <div class="bg-white rounded-2xl shadow-3d p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-home mr-3 text-yellow-500"></i> Your Home Details
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="roof-area">
+                                <i class="fas fa-ruler-combined mr-2 text-blue-500"></i> Roof Area (sq ft)
+                            </label>
+                            <input type="number" id="roof-area" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 1500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="electricity-usage">
+                                <i class="fas fa-bolt mr-2 text-yellow-500"></i> Monthly Electricity Usage (kWh)
+                            </label>
+                            <input type="number" id="electricity-usage" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 900">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="electricity-rate">
+                                <i class="fas fa-money-bill-wave mr-2 text-green-500"></i> Current Electricity Rate ($/kWh)
+                            </label>
+                            <input type="number" step="0.01" id="electricity-rate" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 0.15" value="0.15">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="sun-hours">
+                                <i class="fas fa-sun mr-2 text-orange-500"></i> Average Daily Sunlight Hours
+                            </label>
+                            <select id="sun-hours" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                                <option value="2">Low (2 hours)</option>
+                                <option value="4" selected>Moderate (4 hours)</option>
+                                <option value="6">High (6 hours)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="panel-type">
+                                <i class="fas fa-solar-panel mr-2 text-blue-500"></i> Solar Panel Type
+                            </label>
+                            <select id="panel-type" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                                <option value="300">Standard (300W)</option>
+                                <option value="400">High Efficiency (400W)</option>
+                                <option value="500">Premium (500W)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="panel-cost">
+                                <i class="fas fa-tag mr-2 text-purple-500"></i> Cost per Panel ($)
+                            </label>
+                            <input type="number" id="panel-cost" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 250" value="250">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2" for="installation-cost">
+                                <i class="fas fa-tools mr-2 text-gray-500"></i> Installation Cost ($)
+                            </label>
+                            <input type="number" id="installation-cost" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 3000" value="3000">
+                        </div>
+                        
+                        <button id="calculate-btn" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold py-4 px-6 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-calculator mr-3"></i> Calculate Solar Setup
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Results Section -->
+                <div class="space-y-6">
+                    <!-- Solar Potential Card -->
+                    <div id="results" class="hidden result-card rounded-2xl shadow-3d p-8 animate-pulse-slow">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-chart-line mr-3 text-green-500"></i> Your Solar Potential
+                        </h2>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-sm text-blue-600 font-medium">Panels Needed</p>
+                                <p id="panel-count" class="text-2xl font-bold text-blue-800">--</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <p class="text-sm text-green-600 font-medium">System Size</p>
+                                <p id="system-size" class="text-2xl font-bold text-green-800">-- kW</p>
+                            </div>
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <p class="text-sm text-yellow-600 font-medium">Roof Coverage</p>
+                                <p id="roof-coverage" class="text-2xl font-bold text-yellow-800">--%</p>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <p class="text-sm text-purple-600 font-medium">Daily Production</p>
+                                <p id="daily-production" class="text-2xl font-bold text-purple-800">-- kWh</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-dollar-sign mr-2 text-green-500"></i> Cost Analysis
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Solar Panel Cost:</span>
+                                    <span id="total-panel-cost" class="font-medium">$--</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Installation Cost:</span>
+                                    <span id="total-installation-cost" class="font-medium">$--</span>
+                                </div>
+                                <div class="flex justify-between border-t border-gray-200 pt-2">
+                                    <span class="text-gray-700 font-semibold">Total Initial Cost:</span>
+                                    <span id="total-cost" class="font-bold text-lg">$--</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-coins mr-2 text-yellow-500"></i> Savings Over Time
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Monthly Savings:</span>
+                                    <span id="monthly-savings" class="font-medium">$--</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Annual Savings:</span>
+                                    <span id="annual-savings" class="font-medium">$--</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Payback Period:</span>
+                                    <span id="payback-period" class="font-medium">-- years</span>
+                                </div>
+                                <div class="flex justify-between border-t border-gray-200 pt-2">
+                                    <span class="text-gray-700 font-semibold">10-Year Savings:</span>
+                                    <span id="ten-year-savings" class="font-bold text-lg text-green-600">$--</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-100 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold text-blue-800 mb-2 flex items-center">
+                                <i class="fas fa-leaf mr-2 text-green-600"></i> Environmental Impact
+                            </h3>
+                            <p class="text-blue-700">
+                                Your system will offset approximately <span id="co2-reduction" class="font-bold">--</span> lbs of CO₂ annually, equivalent to planting <span id="trees-equivalent" class="font-bold">--</span> trees.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Solar Panel Visualization -->
+                    <div id="visualization" class="hidden bg-white rounded-2xl shadow-3d p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-solar-panel mr-3 text-orange-500"></i> Recommended Layout
+                        </h2>
+                        <div class="flex justify-center">
+                            <div id="panel-grid" class="grid grid-cols-5 gap-2">
+                                <!-- Panels will be added here dynamically -->
+                            </div>
+                        </div>
+                        <p class="text-center text-sm text-gray-600 mt-4">
+                            <span id="panel-count-visual" class="font-medium">--</span> panels shown (each represents approximately 18 sq ft)
+                        </p>
+                    </div>
+                    
+                    <!-- Tips Section -->
+                    <div class="bg-white rounded-2xl shadow-3d p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-lightbulb mr-3 text-yellow-500"></i> Solar Energy Tips
+                        </h2>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                <span>South-facing roofs typically get the most sunlight in the northern hemisphere</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                <span>Solar panels work even on cloudy days, though at reduced efficiency</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                <span>Many areas offer tax credits or rebates for solar installations</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                <span>Solar panels typically last 25-30 years with minimal maintenance</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculate-btn').addEventListener('click', calculateSolarSetup);
+        
+        function calculateSolarSetup() {
+            // Get input values
+            const roofArea = parseFloat(document.getElementById('roof-area').value);
+            const monthlyUsage = parseFloat(document.getElementById('electricity-usage').value);
+            const electricityRate = parseFloat(document.getElementById('electricity-rate').value);
+            const sunHours = parseFloat(document.getElementById('sun-hours').value);
+            const panelWattage = parseFloat(document.getElementById('panel-type').value);
+            const panelCost = parseFloat(document.getElementById('panel-cost').value);
+            const installationCost = parseFloat(document.getElementById('installation-cost').value);
+            
+            // Validate inputs
+            if (isNaN(roofArea) || isNaN(monthlyUsage) || isNaN(electricityRate) || 
+                isNaN(sunHours) || isNaN(panelWattage) || isNaN(panelCost) || isNaN(installationCost)) {
+                alert('Please fill in all fields with valid numbers');
+                return;
+            }
+            
+            // Calculations
+            const dailyUsage = monthlyUsage / 30;
+            const requiredDailyProduction = dailyUsage * 1.2; // Add 20% buffer
+            const panelDailyProduction = (panelWattage * sunHours) / 1000; // kWh per panel per day
+            
+            const panelsNeeded = Math.ceil(requiredDailyProduction / panelDailyProduction);
+            const systemSize = (panelsNeeded * panelWattage) / 1000; // kW
+            
+            // Roof space calculations (assuming each panel is ~18 sq ft)
+            const panelArea = 18; // sq ft per panel
+            const totalPanelArea = panelsNeeded * panelArea;
+            const roofCoverage = Math.min(100, (totalPanelArea / roofArea) * 100);
+            
+            // Cost calculations
+            const totalPanelCost = panelsNeeded * panelCost;
+            const totalCost = totalPanelCost + installationCost;
+            
+            // Savings calculations
+            const monthlySavings = monthlyUsage * electricityRate;
+            const annualSavings = monthlySavings * 12;
+            const paybackPeriod = totalCost / annualSavings;
+            const tenYearSavings = (annualSavings * 10) - totalCost;
+            
+            // Environmental impact
+            const co2Reduction = Math.round(monthlyUsage * 1.5 * 12); // 1.5 lbs CO2 per kWh
+            const treesEquivalent = Math.round(co2Reduction / 48); // 1 tree absorbs ~48 lbs CO2 per year
+            
+            // Update results
+            document.getElementById('panel-count').textContent = panelsNeeded;
+            document.getElementById('system-size').textContent = systemSize.toFixed(1);
+            document.getElementById('roof-coverage').textContent = roofCoverage.toFixed(1);
+            document.getElementById('daily-production').textContent = (panelsNeeded * panelDailyProduction).toFixed(1);
+            
+            document.getElementById('total-panel-cost').textContent = `$${totalPanelCost.toLocaleString()}`;
+            document.getElementById('total-installation-cost').textContent = `$${installationCost.toLocaleString()}`;
+            document.getElementById('total-cost').textContent = `$${totalCost.toLocaleString()}`;
+            
+            document.getElementById('monthly-savings').textContent = `$${monthlySavings.toFixed(2)}`;
+            document.getElementById('annual-savings').textContent = `$${annualSavings.toLocaleString()}`;
+            document.getElementById('payback-period').textContent = paybackPeriod.toFixed(1);
+            document.getElementById('ten-year-savings').textContent = `$${Math.max(0, tenYearSavings).toLocaleString()}`;
+            
+            document.getElementById('co2-reduction').textContent = co2Reduction.toLocaleString();
+            document.getElementById('trees-equivalent').textContent = treesEquivalent.toLocaleString();
+            
+            // Show results
+            document.getElementById('results').classList.remove('hidden');
+            
+            // Create panel visualization
+            createPanelVisualization(panelsNeeded);
+            document.getElementById('visualization').classList.remove('hidden');
+        }
+        
+        function createPanelVisualization(panelCount) {
+            const panelGrid = document.getElementById('panel-grid');
+            panelGrid.innerHTML = '';
+            
+            // Limit visualization to 50 panels for space
+            const displayCount = Math.min(panelCount, 50);
+            document.getElementById('panel-count-visual').textContent = displayCount;
+            
+            // Calculate grid size (aim for roughly square layout)
+            const cols = Math.ceil(Math.sqrt(displayCount));
+            const rows = Math.ceil(displayCount / cols);
+            
+            // Update grid columns
+            panelGrid.className = `grid gap-2`;
+            panelGrid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+            
+            // Add panels
+            for (let i = 0; i < displayCount; i++) {
+                const panel = document.createElement('div');
+                panel.className = 'solar-panel w-full aspect-square rounded-md shadow-md flex items-center justify-center';
+                panel.innerHTML = `<i class="fas fa-solar-panel text-white opacity-80"></i>`;
+                panelGrid.appendChild(panel);
+            }
+        }
+    </script>
+</body>
+</html>
